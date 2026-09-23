@@ -11,7 +11,7 @@ can do while the app itself is closed and starts the app only when a capture act
 
 **Nothing is captured unless you ask.** There is no watching, no polling, no screen sharing.
 
-## The four tools
+## The tools
 
 | tool | for | needs Screen Recording |
 |---|---|---|
@@ -19,6 +19,8 @@ can do while the app itself is closed and starts the app only when a capture act
 | `list_windows` | every on-screen window with id, owner, title, frame | no |
 | `shot` | one PNG of a window (by `owner`/`title`) or an explicit `rect` | **yes** |
 | `page_shot` | one PNG of a URL, rendered offscreen in a WKWebView | no |
+| `update` | check for a new version and install it | no |
+| `restart` | quit and reopen the app, so a just-granted permission takes effect | no |
 
 `page_shot` needs no grant at all and cannot catch another app's window, so prefer it whenever the
 thing you want to see is a page rather than an app.
@@ -130,10 +132,12 @@ screenshot — say so and give the person these steps rather than guessing:
 `probe` reports `version`, `build` and the `updates` feed, so you can say exactly which copy is
 installed rather than guessing at symptoms.
 
-Updates install themselves: the app checks daily and applies what it finds without asking. A
-person can force it from the app's menu — **plaiiin App Capture ▸ Check for Updates…** — and there
-is no tool for an agent to trigger it, on purpose: an app that rewrites itself because something
-asked it to is not one you would leave running.
+Updates install themselves: the app checks daily and applies what it finds. When you are talking
+to a copy that is missing something described here, do not send the person to a menu — call
+`update`, wait a minute, and `probe` again for the new build. It downloads, installs and relaunches
+on its own. (**plaiiin App Capture ▸ Check for Updates…** does the same by hand.)
 
-If a capability described here is missing and `probe` shows an old `build`, that is the answer:
-the copy is behind, and one Check for Updates… fixes it.
+`restart` is the other one worth knowing: macOS only hands a permission to a FRESH process, so
+after the person grants Screen Recording or Accessibility the app has to be reopened before the
+grant means anything. Call `restart` rather than asking them to quit it, then `probe` to confirm
+the grant took.
