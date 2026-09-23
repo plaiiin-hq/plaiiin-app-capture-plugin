@@ -1,6 +1,6 @@
 ---
 name: app-capture
-description: Use when you need to SEE the Mac you are working on — a screenshot of an app's window, a region of the screen, or a rendered web page — or when a capture comes back looking wrong (a picture of the wallpaper, a window with something across it, a postage stamp instead of a window). Covers the four tools, staging a window before the shot (hide the rest, centre, fit, exact size, all restored afterwards), poster backdrops drawn rather than photographed, and the refusals, which are the most useful thing this tool says.
+description: Use when you need to SEE the Mac you are working on — a screenshot of an app's window, a region of the screen, or a rendered web page — or when a capture comes back looking wrong (a picture of the wallpaper, a window with something across it, a postage stamp instead of a window), or when the capture server does not answer at all and the app has to be installed or updated. Covers the four tools, staging a window before the shot (hide the rest, centre, fit, exact size, all restored afterwards), poster backdrops staged behind the window so its shadow and glass are real, where to download the app and how it keeps itself current, and the refusals, which are the most useful thing this tool says.
 ---
 
 # Seeing the Mac you are working on
@@ -15,7 +15,7 @@ can do while the app itself is closed and starts the app only when a capture act
 
 | tool | for | needs Screen Recording |
 |---|---|---|
-| `probe` | whether capturing is possible at all, and under which identity | no |
+| `probe` | whether capturing is possible, under which identity, and **which version is installed** | no |
 | `list_windows` | every on-screen window with id, owner, title, frame | no |
 | `shot` | one PNG of a window (by `owner`/`title`) or an explicit `rect` | **yes** |
 | `page_shot` | one PNG of a URL, rendered offscreen in a WKWebView | no |
@@ -56,15 +56,15 @@ All opt-in, all restored afterwards — including when the shot fails.
 | `isolate` | hides the other apps, brings this one forward (also the fix for Stage Manager and other desktops) |
 | `center` · `fit` · `size` | centre it, pull one hanging off a screen edge back on, or give it an exact frame. Need Accessibility |
 | `margin` | points of space around the window |
-| `backdrop` | fill that margin with something other than the desktop — see below |
+| `backdrop` | put a surface behind the window instead of the desktop — see below. Needs `isolate` |
 
-The window is photographed **as itself**, so anything lying on top of it is not in the picture even
-without `isolate`.
+Without a `backdrop` the window is photographed **as itself**, so anything lying on top of it is
+not in the picture even without `isolate`.
 
 ## Poster shots
 
 `margin` alone photographs the desktop around the window — wallpaper, other windows, the Dock.
-`backdrop` draws it instead, so a set of shots looks the same on every Mac:
+`backdrop` puts a surface there instead, so a set of shots looks the same on every Mac:
 
 | value | is |
 |---|---|
@@ -75,9 +75,19 @@ without `isolate`.
 ```json
 {"name": "shot", "arguments": {
   "owner": "Safari", "output": "~/Desktop/poster.png",
-  "isolate": true, "margin": 150, "backdrop": "spotlight:#0A84FF:pool"
+  "isolate": true, "margin": 150, "backdrop": "spotlight:#12161B:pool:0.85:0.45"
 }}
 ```
+
+`backdrop` requires `isolate: true`, and the reason is worth knowing: the surface is placed on the
+screen BEHIND the window and the region is photographed, so the window's own shadow falls on it
+and its vibrancy samples it. A border drawn on afterwards has no shadow and its glass still shows
+the desktop that was really there.
+
+A spotlight takes `spotlight:<tint>:<style>:<size>:<strength>` — tint is the colour of the dark,
+strength is contrast (how far the pool lifts toward white), size is how tight the pool is. Useful
+starting points: `spotlight:#12161B:pool:0.85:0.45` (neutral studio), `…:0.9:0.22` (soft, low
+contrast), `#0A0D11:pool:0.7:0.75` (near-black, dramatic), `#191310` warm, `#0D1520` cool.
 
 ## Pages
 
@@ -98,10 +108,32 @@ height; `clip` crops to one element.
 Paths are the person's own: `~` means their home, not a container. Write where they asked, and
 prefer somewhere they will look — the Desktop, or the repo folder the work is in.
 
-## When nothing answers
+## Installing it, when nothing answers
 
 The socket is `~/Library/Group Containers/LA8GX8Y3R9.group.plaiiin/run/appcapture-mcp.sock`. If the
-MCP server fails to connect, the app is not installed: it is a free download from
-**https://plaiiin.com/app-capture** (signed and notarized, not on the App Store — a sandboxed app
-cannot hold the Accessibility grant that staging needs). Tell the person that rather than guessing;
-there is no fallback that produces a real screenshot.
+MCP server fails to connect, the app is not installed. There is no fallback that produces a real
+screenshot — say so and give the person these steps rather than guessing:
+
+1. Download **https://plaiiin.com/app-capture** — a free, Developer-ID signed and notarized disk
+   image, so it opens with no Gatekeeper warning. It is deliberately **not** on the Mac App Store:
+   Apple gives a sandboxed app no Accessibility grant at all, and placing a window before a shot
+   needs one.
+2. Open the image, drag **plaiiin App Capture** to Applications, and open it once. That first
+   launch registers the login agent that answers this socket.
+3. Permissions are asked for only when first needed, and only the person can grant them:
+   **Screen Recording** at the first `shot` (web pages need none), **Accessibility** at the first
+   `center`/`fit`/`size`/`backdrop`. After granting either, the app must be quit and reopened —
+   macOS only hands a grant to a fresh process.
+
+## Keeping it current
+
+`probe` reports `version`, `build` and the `updates` feed, so you can say exactly which copy is
+installed rather than guessing at symptoms.
+
+Updates install themselves: the app checks daily and applies what it finds without asking. A
+person can force it from the app's menu — **plaiiin App Capture ▸ Check for Updates…** — and there
+is no tool for an agent to trigger it, on purpose: an app that rewrites itself because something
+asked it to is not one you would leave running.
+
+If a capability described here is missing and `probe` shows an old `build`, that is the answer:
+the copy is behind, and one Check for Updates… fixes it.
