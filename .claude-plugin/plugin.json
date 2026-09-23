@@ -1,0 +1,15 @@
+{
+  "name": "plaiiin-app-capture",
+  "description": "See the Mac you are working on. `app-capture` photographs a window, a rectangle or a web page on request — a real screen capture, refused rather than faked when it cannot be taken. Covers staging a window (hide the rest, centre, fit, exact size, restored afterwards), poster backdrops that are drawn rather than photographed, and why a refusal beats a picture of the wallpaper.",
+  "author": {
+    "name": "Plaiiin"
+  },
+  "license": "Apache-2.0",
+  "mcpServers": {
+    "app-capture": {
+      "type": "stdio",
+      "command": "/usr/bin/nc",
+      "args": ["-U", "${HOME}/Library/Group Containers/LA8GX8Y3R9.group.plaiiin/run/appcapture-mcp.sock"]
+    }
+  }
+}

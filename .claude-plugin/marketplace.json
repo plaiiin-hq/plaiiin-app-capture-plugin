@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "plaiiin-app-capture",
+  "description": "plaiiin App Capture for Claude Code — ask for a screenshot of a window, a rectangle or a web page, and get a picture or a reason, never a wrong picture.",
+  "owner": {
+    "name": "Plaiiin"
+  },
+  "plugins": [
+    {
+      "name": "plaiiin-app-capture",
+      "description": "Photograph a window, a rect or a web page on the Mac you are working on. Staging, poster backdrops, and refusals that say what to do.",
+      "author": {
+        "name": "Plaiiin"
+      },
+      "category": "productivity",
+      "source": "./",
+      "homepage": "https://github.com/plaiiin-hq/plaiiin-app-capture-plugin",
+      "license": "Apache-2.0"
+    }
+  ]
+}
