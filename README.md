@@ -9,8 +9,8 @@ window, a region or a web page while you talk about it.
 /plugin install plaiiin-app-capture
 ```
 
-Then: *"shoot the Workflows window"*, *"poster shot of Safari on the tea-garden backdrop"*,
-*"render plaiiin.com in light and dark"*.
+Then: *"shoot the Workflows window"*, *"poster shot of Safari on the studio backdrop"*,
+*"render plaiiin.com in light and dark"*, *"film the Finder window while I drag a file"*.
 
 ## What you need
 

@@ -1,6 +1,6 @@
 ---
 name: app-capture
-description: Use when you need to SEE the Mac you are working on — a screenshot of an app's window, a region of the screen, or a rendered web page — or when a capture comes back looking wrong (a picture of the wallpaper, a window with something across it, a postage stamp instead of a window), or when the capture server does not answer at all and the app has to be installed or updated. Covers the four tools, staging a window before the shot (hide the rest, centre, fit, exact size, all restored afterwards), poster backdrops staged behind the window so its shadow and glass are real, where to download the app and how it keeps itself current, and the refusals, which are the most useful thing this tool says.
+description: Use when you need to SEE the Mac you are working on — a screenshot of an app's window, a region of the screen, or a rendered web page — or when a capture comes back looking wrong (a picture of the wallpaper, a window with something across it, a postage stamp instead of a window), or when the capture server does not answer at all and the app has to be installed or updated. Covers every tool — stills, video, keystrokes — presets that give a set of shots one look, staging a window before the shot (hide the rest, centre, fit, exact size, all restored afterwards), poster backdrops staged behind the window so its shadow and glass are real, where to download the app and how it keeps itself current, and the refusals, which are the most useful thing this tool says.
 ---
 
 # Seeing the Mac you are working on
@@ -17,9 +17,13 @@ can do while the app itself is closed and starts the app only when a capture act
 |---|---|---|
 | `probe` | whether capturing is possible, under which identity, and **which version is installed** | no |
 | `list_windows` | every on-screen window with id, owner, title, frame | no |
-| `shot` | one PNG of a window (by `owner`/`title`) or an explicit `rect` | **yes** |
+| `shot` | one PNG of a window (by `owner`/`title`, or `window_id` from `list_windows`) or an explicit `rect` | **yes** |
 | `page_shot` | one PNG of a URL, rendered offscreen in a WKWebView | no |
-| `update` | check for a new version and install it | no |
+| `record` | film a window — ProRes 4444 with system audio. `action: start` … `action: stop` | **yes** |
+| `key_press` | one key (`esc`, `return`, `tab`, `space`) to get an app into the state worth showing | no |
+| `desktop_image` | set the wallpaper the next shots are taken over, and put the person's own back | no |
+| `show_window` | bring App Capture's own window up, or open its Try a Capture panel | no |
+| `update` | check for a new version and install it. It quits to let the installer work and does **not** reopen — the next call starts it | no |
 | `restart` | quit and reopen the app, so a just-granted permission takes effect | no |
 
 `page_shot` needs no grant at all and cannot catch another app's window, so prefer it whenever the
@@ -58,12 +62,37 @@ All opt-in, all restored afterwards — including when the shot fails.
 | `isolate` | hides the other apps, brings this one forward (also the fix for Stage Manager and other desktops) |
 | `center` · `fit` · `size` | centre it, pull one hanging off a screen edge back on, or give it an exact frame. Need Accessibility |
 | `margin` | points of space around the window |
+| `settle` | seconds to let things stop moving before the shutter. A window that is still animating is photographed mid-animation |
 | `backdrop` | put a surface behind the window instead of the desktop — see below. Needs `isolate` |
 
 Without a `backdrop` the window is photographed **as itself**, so anything lying on top of it is
 not in the picture even without `isolate`.
 
-## Poster shots
+## A look, under one name
+
+Reach for a **preset** before writing a backdrop by hand. It is five decisions remembered as one
+word, so a set of shots is actually a set, and it means the same picture next month.
+
+| preset | is | good for |
+|---|---|---|
+| `studio` | near-black with a soft pool of light | the default. Flatters a light or a dark window |
+| `paper` | near-white, lifted slightly in the middle | a light look — and where a window's shadow reads most clearly |
+| `terrace` | the tea-garden photograph | a page or a post that wants warmth |
+
+```json
+{"name": "shot", "arguments": {
+  "owner": "Messages", "preset": "studio", "output": "~/Desktop/messages.png"
+}}
+```
+
+A preset implies `isolate`. Anything you write alongside it wins, so `preset: studio` with
+`margin: 220` is the studio look with more room.
+
+**The shadow in the picture is macOS's own**, not drawn on: the backdrop is really behind the
+window when the shutter fires. On `studio`'s near-black it is subtle by nature; on `paper` it is
+unmistakable. If a shot looks pasted-on, the preset is the reason, not the tool.
+
+## Poster shots, written by hand
 
 `margin` alone photographs the desktop around the window — wallpaper, other windows, the Dock.
 `backdrop` puts a surface there instead, so a set of shots looks the same on every Mac:
